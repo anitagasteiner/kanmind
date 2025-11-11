@@ -2,6 +2,9 @@ from django.db import models
 from django.utils import timezone
 
 # Create your models here.
+class Board(models.Model):
+    title = models.CharField(max_length=50)
+
 class Task(models.Model):    
     TO_DO = "to_do"
     IN_PROGRESS = "in_progress"

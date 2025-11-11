@@ -3,8 +3,17 @@ from rest_framework import generics
 #from rest_framework.response import Response
 #from django.shortcuts import get_object_or_404
 from kanban_app.models import Task
-from .serializers import TaskSerializer
-from kanban_app.models import Task
+from .serializers import BoardSerializer, TaskSerializer
+from kanban_app.models import Board, Task
+
+
+class BoardsView(generics.ListCreateAPIView):
+    queryset = Board.objects.all()
+    serializer_class = BoardSerializer
+
+class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Board.objects.all()
+    serializer_class = BoardSerializer
 
 class TasksView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
