@@ -4,4 +4,5 @@ from kanban_app.models import Task
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['title', 'description']
+        fields = ['id', 'title', 'description']
+        read_only_fields = ['id']
