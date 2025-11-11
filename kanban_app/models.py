@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 class Task(models.Model):    
@@ -26,6 +27,6 @@ class Task(models.Model):
     description = models.TextField(max_length=500)
     status = models.CharField(max_length=11, choices=STATUS_CHOICES, default=TO_DO)
     priority = models.CharField(max_length=6, choices=PRIORITY_CHOICES, default=MEDIUM)
-    due_date = models.DateField()
+    due_date = models.DateField(default=timezone.now)
 
     
