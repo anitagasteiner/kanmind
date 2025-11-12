@@ -6,10 +6,13 @@ from .views import BoardsView, BoardDetail, TasksView, TaskDetail
 # router.register(r'kanban', TaskViewSet, basename='tasks')
 
 urlpatterns = [
-    #path('tasks/', include(router.urls)),
+    #path('', include(router.urls)),
     path('boards/', BoardsView.as_view(), name='boards-list'),
     path('boards/<int:pk>', BoardDetail.as_view(), name='board-detail'),
+    #path('email-check', TODO),
     path('tasks/', TasksView.as_view(), name='tasks-list'),
-    path('tasks/<int:pk>', TaskDetail.as_view(), name='task-detail')
+    path('tasks/<int:pk>', TaskDetail.as_view(), name='task-detail'),
+    #path('tasks/assigned-to-me', TODO),
+    #path('tasks/reviewing', TODO)
 ]
 
