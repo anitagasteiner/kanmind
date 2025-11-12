@@ -2,9 +2,8 @@ from rest_framework import generics
 #from rest_framework.viewsets import ModelViewSet
 #from rest_framework.response import Response
 #from django.shortcuts import get_object_or_404
-from kanban_app.models import Task
-from .serializers import BoardSerializer, TaskSerializer
 from kanban_app.models import Board, Task
+from .serializers import BoardSerializer, TaskSerializer
 
 
 class BoardsView(generics.ListCreateAPIView):
