@@ -4,11 +4,13 @@ from rest_framework import generics
 #from django.shortcuts import get_object_or_404
 from kanban_app.models import Board, Task
 from .serializers import BoardSerializer, TaskSerializer
+from .permissions import IsStaffOrReadOnly
 
 
 class BoardsView(generics.ListCreateAPIView):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
+    permission_classes = [IsStaffOrReadOnly]
 
 class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Board.objects.all()
