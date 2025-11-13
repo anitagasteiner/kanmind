@@ -37,7 +37,15 @@ class LoginView(APIView):
                             status=status.HTTP_401_UNAUTHORIZED)
 
         token, created = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key}, status=status.HTTP_200_OK)
+
+        fullname = f"{user.first_name} {user.last_name}".strip()
+
+        return Response({
+            'token': token.key,
+            'fullname': fullname,
+            'email': user.email,
+            'user_id': user.id
+            }, status=status.HTTP_200_OK)
 
 
 class LogoutView(APIView):
