@@ -23,17 +23,19 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('repeated_password')
-        fullname = validated_data.pop('fullname')
+        fullname = validated_data.pop('fullname').strip()
+
+        parts = fullname.split(' ', 1)
+        first_name = parts[0]
+        last_name = parts[1] if len(parts) > 1 else ''
 
         user = User.objects.create_user(
             username=validated_data['email'],
             email=validated_data['email'],
-            password=validated_data['password']            
+            password=validated_data['password'],
+            first_name=first_name,
+            last_name=last_name
         )
-
-        #user.first_name = fullname
-        #user.save()
-        # -> Wozu? Vielleicht besser splitten? Oder als user.fullname lassen? Ist das möglich?
 
         Token.objects.create(user=user)
 
