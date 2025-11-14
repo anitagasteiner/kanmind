@@ -12,10 +12,10 @@ class Board(models.Model):
         return self.title
     
 
-class Ticket(models.Model):
-    title = models.CharField(max_length=50)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='tickets')
-    assignee = models.ManyToManyField(User, related_name='assignee_of_ticket')
+# class Ticket(models.Model):
+#     title = models.CharField(max_length=50)
+#     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='tickets')
+#     assignee = models.ManyToManyField(User, related_name='assignee_of_ticket')
 
 
 class Task(models.Model):    
@@ -41,6 +41,7 @@ class Task(models.Model):
 
     title = models.CharField(max_length=50)
     description = models.TextField(max_length=500)
+    assignee = models.ManyToManyField(User, related_name='assignee_of_task')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=TO_DO)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default=MEDIUM)
     due_date = models.DateField(default=timezone.now)
