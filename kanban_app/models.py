@@ -13,6 +13,7 @@ class Board(models.Model):
     
 
 class Ticket(models.Model):
+    title = models.CharField(max_length=50)
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='tickets')
 
 
