@@ -9,6 +9,13 @@ class TicketSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ['id', 'title', 'description', 'status', 'priority', 'due_date']
+        read_only_fields = ['id']
+
+
 class BoardSerializer(serializers.ModelSerializer):
     tickets = TicketSerializer(many=True, read_only=True)
     ticket_ids = serializers.PrimaryKeyRelatedField(
@@ -18,20 +25,29 @@ class BoardSerializer(serializers.ModelSerializer):
         source='tickets'
     )
     ticket_count = serializers.SerializerMethodField()
+
+    tasks = TaskSerializer(many=True, read_only=True)
+    task_ids = serializers.PrimaryKeyRelatedField(
+        queryset=Task.objects.all(),
+        many=True,
+        write_only=True,
+        source='tasks'
+    )
+    tasks_to_do_count = serializers.SerializerMethodField()
+    tasks_high_prio_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Board
-        fields = ['id', 'title', 'ticket_ids', 'ticket_count', 'tickets']
+        fields = ['id', 'title', 'ticket_ids', 'ticket_count', 'tickets', 'task_ids', 'tasks_to_do_count','tasks_high_prio_count', 'tasks']
         read_only_fields = ['id']
 
     def get_ticket_count(self, obj):
         return obj.tickets.count()
-
-
-class TaskSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Task
-        fields = ['id', 'title', 'description', 'status', 'priority', 'due_date']
-        read_only_fields = ['id']
+    
+    def get_tasks_to_do_count(self, obj):
+        return obj.tasks.filter(status=Task.TO_DO).count()
+    
+    def get_tasks_high_prio_count(self, obj):
+        return obj.tasks.filter(priority=Task.HIGH).count()
 
 
