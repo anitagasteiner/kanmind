@@ -2,13 +2,6 @@ from rest_framework import serializers
 from kanban_app.models import Board, Task
 
 
-# class TicketSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Ticket
-#         fields = ['id', 'title', 'board']
-#         read_only_fields = ['id']
-
-
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
@@ -16,13 +9,8 @@ class TaskSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class BoardSerializer(serializers.ModelSerializer):  
-    # members = serializers.PrimaryKeyRelatedField(
-    #     queryset=Board.members.field.related_model.objects.all(), # User.objects
-    #     many=True
-    # )
+class BoardSerializer(serializers.ModelSerializer):
     member_count = serializers.SerializerMethodField()
-
     # tasks = TaskSerializer(many=True, read_only=True)
     # task_ids = serializers.PrimaryKeyRelatedField(
     #     queryset=Task.objects.all(),
