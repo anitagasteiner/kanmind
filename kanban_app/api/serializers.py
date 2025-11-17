@@ -16,43 +16,34 @@ class TaskSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
 
-class BoardSerializer(serializers.ModelSerializer):
-    # tickets = TicketSerializer(many=True, read_only=True)
-    # ticket_ids = serializers.PrimaryKeyRelatedField(
-    #     queryset=Ticket.objects.all(),
-    #     many=True,
-    #     write_only=True,
-    #     source='tickets'
-    # )
-    # ticket_count = serializers.SerializerMethodField()
-    
+class BoardSerializer(serializers.ModelSerializer):  
     # members = serializers.PrimaryKeyRelatedField(
     #     queryset=Board.members.field.related_model.objects.all(), # User.objects
     #     many=True
     # )
     member_count = serializers.SerializerMethodField()
 
-    #tasks = TaskSerializer(many=True, read_only=True)
+    # tasks = TaskSerializer(many=True, read_only=True)
     # task_ids = serializers.PrimaryKeyRelatedField(
     #     queryset=Task.objects.all(),
     #     many=True,
     #     write_only=True,
     #     source='tasks'
     # )
-    ticket_count = serializers.SerializerMethodField()
+    tasks_count = serializers.SerializerMethodField()
     tasks_to_do_count = serializers.SerializerMethodField()
     tasks_high_prio_count = serializers.SerializerMethodField()
     owner_id = serializers.IntegerField(source='owner.id', read_only=True)
     
     class Meta:
         model = Board
-        fields = ['id', 'title', 'member_count', 'ticket_count', 'tasks_to_do_count','tasks_high_prio_count', 'owner_id']
+        fields = ['id', 'title', 'member_count', 'tasks_count', 'tasks_to_do_count','tasks_high_prio_count', 'owner_id']
         read_only_fields = ['id']
 
     def get_member_count(self, obj):
         return obj.members.count()
 
-    def get_ticket_count(self, obj):
+    def get_tasks_count(self, obj):
         return obj.tasks.count()
     
     def get_tasks_to_do_count(self, obj):
@@ -69,4 +60,16 @@ class BoardSerializer(serializers.ModelSerializer):
         return board
 
 
+class BoardDetailSerializer(serializers.ModelSerializer):
+    owner_id = serializers.IntegerField(source='owner.id', read_only=True)
+    members = serializers.PrimaryKeyRelatedField(
+        queryset=Board.members.field.related_model.objects.all(), # User.objects
+        many=True
+    )
+    tasks = TaskSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Board
+        fields = ['id', 'title', 'owner_id', 'members', 'tasks']
+        read_only_fields = ['id']
 
