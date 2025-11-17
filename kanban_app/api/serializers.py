@@ -73,3 +73,15 @@ class BoardDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'owner_id', 'members', 'tasks']
         read_only_fields = ['id']
 
+
+class BoardUpdateSerializer(serializers.ModelSerializer):
+    members = serializers.PrimaryKeyRelatedField(
+        queryset=Board.members.field.related_model.objects.all(), # User.objects
+        many=True
+    )
+
+    class Meta:
+        model = Board
+        fields = ['id', 'title', 'owner', 'members']
+
+
