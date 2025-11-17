@@ -12,12 +12,6 @@ class Board(models.Model):
         return self.title
     
 
-# class Ticket(models.Model):
-#     title = models.CharField(max_length=50)
-#     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='tickets')
-#     assignee = models.ManyToManyField(User, related_name='assignee_of_ticket')
-
-
 class Task(models.Model):    
     TO_DO = "to_do"
     IN_PROGRESS = "in_progress"
