@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from kanban_app.models import Board, Task
 
 
@@ -10,6 +11,11 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
+    members = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        many=True,
+        required=False
+    )
     member_count = serializers.SerializerMethodField()
     # tasks = TaskSerializer(many=True, read_only=True)
     # task_ids = serializers.PrimaryKeyRelatedField(
@@ -25,7 +31,7 @@ class BoardSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Board
-        fields = ['id', 'title', 'member_count', 'tasks_count', 'tasks_to_do_count','tasks_high_prio_count', 'owner_id']
+        fields = ['id', 'title', 'members', 'member_count', 'tasks_count', 'tasks_to_do_count','tasks_high_prio_count', 'owner_id']
         read_only_fields = ['id']
 
     def get_member_count(self, obj):
@@ -42,7 +48,7 @@ class BoardSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         members = validated_data.pop('members', [])
-        owner = self.context['request'].user # Owner aus context (request.user)
+        owner = self.context['request'].user # Owner aus context (request.user); Owner ist immer der eingeloggte User.
         board = Board.objects.create(owner=owner, **validated_data)
         board.members.set(members)
         return board
@@ -51,7 +57,7 @@ class BoardSerializer(serializers.ModelSerializer):
 class BoardDetailSerializer(serializers.ModelSerializer):
     owner_id = serializers.IntegerField(source='owner.id', read_only=True)
     members = serializers.PrimaryKeyRelatedField(
-        queryset=Board.members.field.related_model.objects.all(), # User.objects
+        queryset=User.objects.all(),
         many=True
     )
     tasks = TaskSerializer(many=True, read_only=True)
