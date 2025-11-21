@@ -1,12 +1,14 @@
-from rest_framework import generics
+from rest_framework import generics, status
+from rest_framework.views import APIView
 #from rest_framework.permissions import AllowAny, IsAuthenticated
 #from rest_framework.permissions import IsAuthenticated
 #from rest_framework.viewsets import ModelViewSet
-#from rest_framework.response import Response
+from rest_framework.response import Response
 from django.db.models import Q
+from django.contrib.auth.models import User
 #from django.shortcuts import get_object_or_404
 from kanban_app.models import Board, Task
-from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer
+from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserEmailCheckSerializer
 from .permissions import IsStaffOrReadOnly, IsOwner
 
 
@@ -29,6 +31,29 @@ class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
             return BoardUpdateSerializer
         return BoardDetailSerializer
 
+class EmailCheckView(APIView):
+    def get(self, request):
+        email = request.query_params.get('email')
+
+        if not email:
+            return Response(
+                {"error": "Email parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response(
+                {"exists": False, "user": None},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        serializer = UserEmailCheckSerializer(user)
+        return Response(
+            {"exists": True, "user": serializer.data},
+            status=status.HTTP_200_OK
+        )
 
 class TasksView(generics.ListCreateAPIView):
     queryset = Task.objects.all()

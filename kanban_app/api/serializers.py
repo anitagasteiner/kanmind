@@ -79,3 +79,12 @@ class BoardUpdateSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'owner', 'members']
 
 
+class UserEmailCheckSerializer(serializers.ModelSerializer):
+    fullname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'fullname']
+
+    def get_fullname(self, obj):
+        return obj.get_full_name()
