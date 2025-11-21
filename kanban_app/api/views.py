@@ -1,14 +1,14 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 #from rest_framework.permissions import AllowAny, IsAuthenticated
-#from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 #from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from django.db.models import Q
 from django.contrib.auth.models import User
 #from django.shortcuts import get_object_or_404
 from kanban_app.models import Board, Task
-from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserEmailCheckSerializer
+from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedSerializer
 from .permissions import IsStaffOrReadOnly, IsOwner
 
 
@@ -49,7 +49,7 @@ class EmailCheckView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        serializer = UserEmailCheckSerializer(user)
+        serializer = UserMiniSerializer(user)
         return Response(
             {"exists": True, "user": serializer.data},
             status=status.HTTP_200_OK
@@ -67,4 +67,12 @@ class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
 #     queryset = Task.objects.all()
 #     serializer_class = TaskSerializer
 
+class TasksAssignedToMeView(generics.ListAPIView):
+    serializer_class = TaskAssignedSerializer
+    permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        return Task.objects.filter(assignee=user).distinct()
+    
+    

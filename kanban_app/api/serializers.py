@@ -79,7 +79,7 @@ class BoardUpdateSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'owner', 'members']
 
 
-class UserEmailCheckSerializer(serializers.ModelSerializer):
+class UserMiniSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
 
     class Meta:
@@ -88,3 +88,26 @@ class UserEmailCheckSerializer(serializers.ModelSerializer):
 
     def get_fullname(self, obj):
         return obj.get_full_name()
+
+
+class TaskAssignedSerializer(serializers.ModelSerializer):
+    assignee = serializers.SerializerMethodField()
+    reviewer = serializers.SerializerMethodField()
+    comments_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Task
+        fields = ['id', 'board', 'title','description', 'status', 'priority', 'assignee', 'reviewer', 'due_date', 'comments_count']
+
+    def get_assignee(self, obj):
+        user = obj.assignee.first()
+        if not user:
+            return None
+        return UserMiniSerializer(user).data
+    
+    def get_reviewer(self, obj):
+        return None # TODO: Reviewer ist noch nicht implementiert!
+    
+    def get_comments_count(self, obj):
+        return 0 # TODO Comments existieren noch nicht!
+    
