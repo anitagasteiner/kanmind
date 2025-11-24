@@ -17,13 +17,6 @@ class BoardSerializer(serializers.ModelSerializer):
         required=False
     )
     member_count = serializers.SerializerMethodField()
-    # tasks = TaskSerializer(many=True, read_only=True)
-    # task_ids = serializers.PrimaryKeyRelatedField(
-    #     queryset=Task.objects.all(),
-    #     many=True,
-    #     write_only=True,
-    #     source='tasks'
-    # )
     tasks_count = serializers.SerializerMethodField()
     tasks_to_do_count = serializers.SerializerMethodField()
     tasks_high_prio_count = serializers.SerializerMethodField()
@@ -90,10 +83,10 @@ class UserMiniSerializer(serializers.ModelSerializer):
         return obj.get_full_name()
 
 
-class TaskCreateSerializer(serializers.ModelSerializer):
-    #assignee_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     assignee_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
+        required=False,
         write_only=True
     )
     reviewer_id = serializers.PrimaryKeyRelatedField(
@@ -118,27 +111,23 @@ class TaskCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         assignee = validated_data.pop('assignee_id')
         reviewer = validated_data.pop('reviewer_id', None)
-
-        # try:
-        #     assignee = User.objects.get(id=assignee_id)
-        # except User.DoesNotExist:
-        #     raise serializers.ValidationError({'assignee_id': 'User does not exist.'})
-
-        # reviewer = None
-        # if reviewer_id is not None:
-        #     try:
-        #         reviewer = User.objects.get(id=reviewer_id)
-        #     except User.DoesNotExist:
-        #         raise serializers.ValidationError({'reviewer_id': 'User does not exist.'})
             
         task = Task.objects.create(
             assignee=assignee,
             reviewer=reviewer,
             **validated_data
         )
-        #task.assignee.set([assignee])
 
         return task
+    
+    def update(self, instance, validated_data):
+        if 'assignee_id' in validated_data:
+            instance.assignee = validated_data.pop('assignee_id')
+
+        if 'reviewer_id' in validated_data:
+            instance.reviewer = validated_data.pop('reviewer_id')
+
+        return super().update(instance, validated_data)
 
 
 class TaskAssignedOrReviewingSerializer(serializers.ModelSerializer):
@@ -153,17 +142,5 @@ class TaskAssignedOrReviewingSerializer(serializers.ModelSerializer):
     def get_comments_count(self, obj):
         return 0 # TODO Comments existieren noch nicht!
     
-
-# class TaskReviewingSerializer(serializers.ModelSerializer):
-#     assignee = UserMiniSerializer(read_only=True)
-#     reviewer = UserMiniSerializer(read_only=True)
-#     comments_count = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = Task
-#         fields = ['id', 'board', 'title','description', 'status', 'priority', 'assignee', 'reviewer', 'due_date', 'comments_count']
-    
-#     def get_comments_count(self, obj):
-#         return 0 # TODO Comments existieren noch nicht!
 
 
