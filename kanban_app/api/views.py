@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 #from django.shortcuts import get_object_or_404
 from kanban_app.models import Board, Task
 from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer
-from .permissions import IsStaffOrReadOnly, IsOwner
+from .permissions import IsStaffOrReadOnly, IsOwner, IsBoardMember
 
 
 class BoardsView(generics.ListCreateAPIView):
@@ -67,7 +67,7 @@ class TasksView(generics.ListCreateAPIView):
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     #serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated] #IsBoardMember
+    permission_classes = [IsAuthenticated, IsBoardMember]
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
