@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 #from django.shortcuts import get_object_or_404
 from kanban_app.models import Board, Task
-from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedSerializer, TaskCreateSerializer
+from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateSerializer
 from .permissions import IsStaffOrReadOnly, IsOwner
 
 
@@ -81,11 +81,18 @@ class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
 #     serializer_class = TaskSerializer
 
 class TasksAssignedToMeView(generics.ListAPIView):
-    serializer_class = TaskAssignedSerializer
+    serializer_class = TaskAssignedOrReviewingSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
         return Task.objects.filter(assignee=user).distinct()
     
-    
+
+class TasksReviewingView(generics.ListAPIView):
+    serializer_class = TaskAssignedOrReviewingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Task.objects.filter(reviewer=user).distinct()

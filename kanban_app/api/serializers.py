@@ -141,26 +141,29 @@ class TaskCreateSerializer(serializers.ModelSerializer):
         return task
 
 
-class TaskAssignedSerializer(serializers.ModelSerializer):
+class TaskAssignedOrReviewingSerializer(serializers.ModelSerializer):
     assignee = UserMiniSerializer(read_only=True)
     reviewer = UserMiniSerializer(read_only=True)
-    # assignee = serializers.SerializerMethodField()
-    # reviewer = serializers.SerializerMethodField()
     comments_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
         fields = ['id', 'board', 'title','description', 'status', 'priority', 'assignee', 'reviewer', 'due_date', 'comments_count']
-
-    # def get_assignee(self, obj):
-    #     user = obj.assignee.first()
-    #     if not user:
-    #         return None
-    #     return UserMiniSerializer(user).data
-    
-    #def get_reviewer(self, obj):
-       # return None # TODO: Reviewer ist noch nicht implementiert!
     
     def get_comments_count(self, obj):
         return 0 # TODO Comments existieren noch nicht!
     
+
+# class TaskReviewingSerializer(serializers.ModelSerializer):
+#     assignee = UserMiniSerializer(read_only=True)
+#     reviewer = UserMiniSerializer(read_only=True)
+#     comments_count = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = Task
+#         fields = ['id', 'board', 'title','description', 'status', 'priority', 'assignee', 'reviewer', 'due_date', 'comments_count']
+    
+#     def get_comments_count(self, obj):
+#         return 0 # TODO Comments existieren noch nicht!
+
+
