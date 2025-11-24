@@ -90,6 +90,57 @@ class UserMiniSerializer(serializers.ModelSerializer):
         return obj.get_full_name()
 
 
+class TaskCreateSerializer(serializers.ModelSerializer):
+    #assignee_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    assignee_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        write_only=True
+    )
+    reviewer_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        allow_null=True,
+        write_only=True
+    )
+    assignee = UserMiniSerializer(read_only=True)
+    reviewer = UserMiniSerializer(read_only=True)
+    comments_count = serializers.SerializerMethodField()
+    status = serializers.ChoiceField(choices=Task.STATUS_CHOICES)
+    priority = serializers.ChoiceField(choices=Task.PRIORITY_CHOICES)
+
+    class Meta:
+        model = Task
+        fields = ['id', 'board', 'title', 'description', 'status', 'priority', 'assignee_id', 'reviewer_id', 'assignee', 'reviewer', 'due_date', 'comments_count']
+
+    def get_comments_count(self, obj):
+        return 0 # TODO Comments sind noch nicht implementiert!
+    
+    def create(self, validated_data):
+        assignee = validated_data.pop('assignee_id')
+        reviewer = validated_data.pop('reviewer_id', None)
+
+        # try:
+        #     assignee = User.objects.get(id=assignee_id)
+        # except User.DoesNotExist:
+        #     raise serializers.ValidationError({'assignee_id': 'User does not exist.'})
+
+        # reviewer = None
+        # if reviewer_id is not None:
+        #     try:
+        #         reviewer = User.objects.get(id=reviewer_id)
+        #     except User.DoesNotExist:
+        #         raise serializers.ValidationError({'reviewer_id': 'User does not exist.'})
+            
+        task = Task.objects.create(
+            assignee=assignee,
+            reviewer=reviewer,
+            **validated_data
+        )
+        #task.assignee.set([assignee])
+
+        return task
+
+
 class TaskAssignedSerializer(serializers.ModelSerializer):
     assignee = serializers.SerializerMethodField()
     reviewer = serializers.SerializerMethodField()

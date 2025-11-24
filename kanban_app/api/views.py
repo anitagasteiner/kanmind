@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 #from django.shortcuts import get_object_or_404
 from kanban_app.models import Board, Task
-from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedSerializer
+from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedSerializer, TaskCreateSerializer
 from .permissions import IsStaffOrReadOnly, IsOwner
 
 
@@ -57,7 +57,20 @@ class EmailCheckView(APIView):
 
 class TasksView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
-    serializer_class = TaskSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return TaskCreateSerializer
+        return TaskSerializer
+    
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self. get_serializer(data=request.data)
+    #     if not serializer.is_valid():
+    #         print(serializer.errors)
+    #     serializer.is_valid(raise_exception=True)
+    #     self.perform_create(serializer)
+    #     return Response(serializer.data, status=201)
+
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()

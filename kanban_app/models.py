@@ -35,7 +35,18 @@ class Task(models.Model):
 
     title = models.CharField(max_length=50)
     description = models.TextField(max_length=500)
-    assignee = models.ManyToManyField(User, related_name='assignee_of_task')
+    assignee = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='assigned_tasks'
+    )
+    reviewer = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='reviewed_tasks'
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=TO_DO)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default=MEDIUM)
     due_date = models.DateField(default=timezone.now)
