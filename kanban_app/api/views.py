@@ -66,14 +66,12 @@ class TasksView(generics.ListCreateAPIView):
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
-    #serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated, IsBoardMember]
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
             return TaskCreateUpdateSerializer
         return TaskSerializer
-
     
 
 class TasksAssignedToMeView(generics.ListAPIView):
@@ -110,3 +108,15 @@ class CommentsView(generics.ListCreateAPIView):
             author=self.request.user,
             task_id=self.kwargs['pk']
         )
+
+class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
+    #permission_classes = []
+
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return CommentCreateUpdateSerializer
+        return CommentSerializer
+    
+    def get_queryset(self):
+        task_id = self.kwargs['task_pk']
+        return Comment.objects.filter(task_id=task_id)
