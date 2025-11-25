@@ -150,17 +150,26 @@ class TaskAssignedOrReviewingSerializer(serializers.ModelSerializer):
     
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SerializerMethodField()
+
     class Meta:
         model = Comment
         fields = ['id', 'created_at', 'author', 'content']
         read_only_fields = ['id']
 
+    def get_author(self, obj):
+        return obj.author.get_full_name() if obj.author else None
+
 
 class CommentCreateUpdateSerializer(serializers.ModelSerializer):
-    author_id = serializers.IntegerField(source='author.id', read_only=True)
+    #author_id = serializers.IntegerField(source='author.id', read_only=True)
+    author = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ['id', 'created_at', 'author_id', 'content']
-        read_only_fields = ['id', 'created_at', 'author_id']
+        fields = ['id', 'created_at', 'author', 'content']
+        read_only_fields = ['id', 'created_at']
+    
+    def get_author(self, obj):
+        return obj.author.get_full_name()
 
