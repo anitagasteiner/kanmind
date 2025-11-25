@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from django.db.models import Q
 from django.contrib.auth.models import User
 #from django.shortcuts import get_object_or_404
-from kanban_app.models import Board, Task
-from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer
+from kanban_app.models import Board, Task, Comment
+from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer
 from .permissions import IsStaffOrReadOnly, IsOwner, IsBoardMember
 
 
@@ -92,4 +92,13 @@ class TasksReviewingView(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Task.objects.filter(reviewer=user).distinct()
+
+
+class CommentsView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            pass
+        return  CommentSerializer
 

@@ -1,9 +1,15 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from kanban_app.models import Board, Task
+from kanban_app.models import Board, Task, Comment
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    #     members = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.all(),
+    #     many=True,
+    #     required=False
+    # )
+
     class Meta:
         model = Task
         fields = ['id', 'title', 'description', 'status', 'priority', 'due_date']
@@ -143,4 +149,9 @@ class TaskAssignedOrReviewingSerializer(serializers.ModelSerializer):
         return 0 # TODO Comments existieren noch nicht!
     
 
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'created_at', 'author', 'content']
+        read_only_fields = ['id']
 
