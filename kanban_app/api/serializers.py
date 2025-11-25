@@ -155,3 +155,12 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'created_at', 'author', 'content']
         read_only_fields = ['id']
 
+
+class CommentCreateUpdateSerializer(serializers.ModelSerializer):
+    author_id = serializers.IntegerField(source='author.id', read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'created_at', 'author_id', 'content']
+        read_only_fields = ['id', 'created_at', 'author_id']
+

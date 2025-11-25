@@ -5,8 +5,15 @@ from django.contrib.auth.models import User
 
 class Board(models.Model):
     title = models.CharField(max_length=50)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_boards')
-    members = models.ManyToManyField(User, related_name='member_of_boards')
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='owned_boards'
+    )
+    members = models.ManyToManyField(
+        User,
+        related_name='member_of_boards'
+    )
     
     def __str__(self):
         return self.title
@@ -50,19 +57,30 @@ class Task(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=TO_DO)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default=MEDIUM)
     due_date = models.DateField(default=timezone.now)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='tasks')
+    board = models.ForeignKey(
+        Board,
+        on_delete=models.CASCADE,
+        related_name='tasks'
+    )
 
     def __str__(self):
         return self.title
 
 
 class Comment(models.Model):
-    created_at = models.DateField(default=timezone.now)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='own_comments')
+    created_at = models.DateTimeField(default=timezone.now)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='own_comments'
+    )
     content = models.TextField(max_length=500)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments')
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
 
     def __str__(self):
-        return f"{self.author}: {self.content}"
+        return self.content
     
-
