@@ -9,12 +9,12 @@ from django.contrib.auth.models import User
 #from django.shortcuts import get_object_or_404
 from kanban_app.models import Board, Task, Comment
 from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer
-from .permissions import IsStaffOrReadOnly, IsOwner, IsBoardMember
+from .permissions import IsOwner, IsMember, IsBoardOwner, IsBoardMember
 
 
 class BoardsView(generics.ListCreateAPIView):
-    #queryset = Board.objects.all()
     serializer_class = BoardSerializer
+    permission_classes = [IsOwner | IsMember]
 
     def get_queryset(self):
         user = self.request.user
@@ -24,7 +24,7 @@ class BoardsView(generics.ListCreateAPIView):
 
 class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Board.objects.all()
-    permission_classes = [IsOwner]
+    permission_classes = [IsOwner | IsMember]
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
@@ -57,6 +57,7 @@ class EmailCheckView(APIView):
 
 class TasksView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
+    permission_classes = [IsBoardOwner | IsBoardMember]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -66,7 +67,7 @@ class TasksView(generics.ListCreateAPIView):
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
-    permission_classes = [IsAuthenticated, IsBoardMember]
+    permission_classes = [IsBoardOwner | IsBoardMember]
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
@@ -76,7 +77,7 @@ class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class TasksAssignedToMeView(generics.ListAPIView):
     serializer_class = TaskAssignedOrReviewingSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsBoardOwner | IsBoardMember]
 
     def get_queryset(self):
         user = self.request.user
@@ -85,7 +86,7 @@ class TasksAssignedToMeView(generics.ListAPIView):
 
 class TasksReviewingView(generics.ListAPIView):
     serializer_class = TaskAssignedOrReviewingSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsBoardOwner | IsBoardMember]
 
     def get_queryset(self):
         user = self.request.user
@@ -93,6 +94,7 @@ class TasksReviewingView(generics.ListAPIView):
 
 
 class CommentsView(generics.ListCreateAPIView):
+    #permission_classes = []
     
     def get_queryset(self):
         task_id = self.kwargs['pk']
