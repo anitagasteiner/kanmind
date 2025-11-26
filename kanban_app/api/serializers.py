@@ -65,20 +65,11 @@ class UserMiniSerializer(serializers.ModelSerializer):
 
 
 class BoardDetailSerializer(serializers.ModelSerializer):
-    owner_data = UserMiniSerializer(
-        source='owner',
+    owner_id = serializers.IntegerField(
+        source='owner.id',
         read_only=True
     )
-    members_data = UserMiniSerializer(
-        source='members',
-        many=True,
-        read_only=True
-    )
-    # owner_id = serializers.IntegerField(source='owner.id', read_only=True)
-    # members = serializers.PrimaryKeyRelatedField(
-    #     queryset=User.objects.all(),
-    #     many=True
-    # )
+    members = serializers.SerializerMethodField()
     tasks = TaskSerializer(
         many=True,
         read_only=True
@@ -86,8 +77,11 @@ class BoardDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Board
-        fields = ['id', 'title', 'owner_data', 'members_data', 'tasks']
-        read_only_fields = ['id', 'owner_data', 'members_data', 'tasks']
+        fields = ['id', 'title', 'owner_id', 'members', 'tasks']
+        read_only_fields = ['id', 'title', 'owner_id', 'members', 'tasks']
+
+    def get_members(self, obj):
+        return UserMiniSerializer(obj.members.all(), many=True).data
 
 
 class BoardUpdateSerializer(serializers.ModelSerializer):
