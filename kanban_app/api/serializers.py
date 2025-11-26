@@ -53,31 +53,6 @@ class BoardSerializer(serializers.ModelSerializer):
         return board
 
 
-class BoardDetailSerializer(serializers.ModelSerializer):
-    owner_id = serializers.IntegerField(source='owner.id', read_only=True)
-    members = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        many=True
-    )
-    tasks = TaskSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Board
-        fields = ['id', 'title', 'owner_id', 'members', 'tasks']
-        read_only_fields = ['id']
-
-
-class BoardUpdateSerializer(serializers.ModelSerializer):
-    members = serializers.PrimaryKeyRelatedField(
-        queryset=Board.members.field.related_model.objects.all(), # User.objects
-        many=True
-    )
-
-    class Meta:
-        model = Board
-        fields = ['id', 'title', 'owner', 'members']
-
-
 class UserMiniSerializer(serializers.ModelSerializer):
     fullname = serializers.SerializerMethodField()
 
@@ -87,6 +62,54 @@ class UserMiniSerializer(serializers.ModelSerializer):
 
     def get_fullname(self, obj):
         return obj.get_full_name()
+
+
+class BoardDetailSerializer(serializers.ModelSerializer):
+    owner_data = UserMiniSerializer(
+        source='owner',
+        read_only=True
+    )
+    members_data = UserMiniSerializer(
+        source='members',
+        many=True,
+        read_only=True
+    )
+    # owner_id = serializers.IntegerField(source='owner.id', read_only=True)
+    # members = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.all(),
+    #     many=True
+    # )
+    tasks = TaskSerializer(
+        many=True,
+        read_only=True
+    )
+
+    class Meta:
+        model = Board
+        fields = ['id', 'title', 'owner_data', 'members_data', 'tasks']
+        read_only_fields = ['id', 'owner_data', 'members_data', 'tasks']
+
+
+class BoardUpdateSerializer(serializers.ModelSerializer):
+    members = serializers.PrimaryKeyRelatedField(
+        queryset=Board.members.field.related_model.objects.all(), # User.objects
+        many=True,
+        write_only=True
+    )
+    owner_data = UserMiniSerializer(
+        source='owner',
+        read_only=True
+    )
+    members_data = UserMiniSerializer(
+        source='members',
+        many=True,
+        read_only=True
+    )
+
+    class Meta:
+        model = Board
+        fields = ['id', 'title', 'members', 'owner_data', 'members_data']
+        read_only_fields = ['id', 'owner_data', 'members_data']
 
 
 class TaskCreateUpdateSerializer(serializers.ModelSerializer):
