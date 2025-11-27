@@ -32,7 +32,8 @@ class BoardSerializer(serializers.ModelSerializer):
     members = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
         many=True,
-        required=False
+        required=False,
+        write_only=True
     )
     member_count = serializers.SerializerMethodField()
     tasks_count = serializers.SerializerMethodField()
@@ -75,7 +76,6 @@ class BoardDetailSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True
     )
-    #TODO: Beim Task wird noch nicht alles richtig angezeigt!
 
     class Meta:
         model = Board
@@ -131,7 +131,7 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
         fields = ['id', 'board', 'title', 'description', 'status', 'priority', 'assignee_id', 'reviewer_id', 'assignee', 'reviewer', 'due_date', 'comments_count']
 
     def get_comments_count(self, obj):
-        return 0 # TODO Comments sind noch nicht implementiert!
+        return obj.comments.count()
     
     def create(self, validated_data):
         assignee = validated_data.pop('assignee_id')
@@ -165,7 +165,7 @@ class TaskAssignedOrReviewingSerializer(serializers.ModelSerializer):
         fields = ['id', 'board', 'title','description', 'status', 'priority', 'assignee', 'reviewer', 'due_date', 'comments_count']
     
     def get_comments_count(self, obj):
-        return 0 # TODO Comments existieren noch nicht!
+        return obj.comments.count()
     
 
 class CommentSerializer(serializers.ModelSerializer):
