@@ -3,17 +3,29 @@ from django.contrib.auth.models import User
 from kanban_app.models import Board, Task, Comment
 
 
+class UserMiniSerializer(serializers.ModelSerializer):
+    fullname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'fullname']
+
+    def get_fullname(self, obj):
+        return obj.get_full_name()
+
+
 class TaskSerializer(serializers.ModelSerializer):
-    #     members = serializers.PrimaryKeyRelatedField(
-    #     queryset=User.objects.all(),
-    #     many=True,
-    #     required=False
-    # )
+    assignee = UserMiniSerializer(read_only=True)
+    reviewer = UserMiniSerializer(read_only=True)
+    comments_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
-        fields = ['id', 'title', 'description', 'status', 'priority', 'due_date']
+        fields = ['id', 'title', 'description', 'status', 'priority', 'assignee', 'reviewer', 'due_date', 'comments_count']
         read_only_fields = ['id']
+    
+    def get_comments_count(self, obj):
+        return obj.comments.count()
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -53,17 +65,6 @@ class BoardSerializer(serializers.ModelSerializer):
         return board
 
 
-class UserMiniSerializer(serializers.ModelSerializer):
-    fullname = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ['id', 'email', 'fullname']
-
-    def get_fullname(self, obj):
-        return obj.get_full_name()
-
-
 class BoardDetailSerializer(serializers.ModelSerializer):
     owner_id = serializers.IntegerField(
         source='owner.id',
@@ -74,6 +75,7 @@ class BoardDetailSerializer(serializers.ModelSerializer):
         many=True,
         read_only=True
     )
+    #TODO: Beim Task wird noch nicht alles richtig angezeigt!
 
     class Meta:
         model = Board
