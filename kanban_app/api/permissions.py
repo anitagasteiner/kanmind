@@ -1,5 +1,5 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
-from kanban_app.models import Board
+from rest_framework.permissions import BasePermission #, SAFE_METHODS
+#from kanban_app.models import Board
 
 # class ReadOnly(BasePermission):
 #     def has_permission(self, request, view):
