@@ -8,12 +8,12 @@ from django.contrib.auth.models import User
 #from django.shortcuts import get_object_or_404
 from kanban_app.models import Board, Task, Comment
 from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer
-from .permissions import IsOwner, IsMember, IsBoardOwner, IsBoardMember
+from .permissions import IsBoardOwner, IsBoardMember, IsAuthor
 
 
 class BoardsView(generics.ListCreateAPIView):
     serializer_class = BoardSerializer
-    permission_classes = [IsOwner | IsMember]
+    permission_classes = [IsBoardOwner | IsBoardMember]
 
     def get_queryset(self):
         user = self.request.user
@@ -23,7 +23,7 @@ class BoardsView(generics.ListCreateAPIView):
 
 class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Board.objects.all()
-    permission_classes = [IsOwner | IsMember]
+    permission_classes = [IsBoardOwner | IsBoardMember]
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
@@ -95,7 +95,7 @@ class TasksReviewingView(generics.ListAPIView):
 
 
 class CommentsView(generics.ListCreateAPIView):
-    #permission_classes = []
+    permission_classes = [IsBoardOwner | IsBoardMember]
     
     def get_queryset(self):
         task_id = self.kwargs['pk']
@@ -112,14 +112,23 @@ class CommentsView(generics.ListCreateAPIView):
             task_id=self.kwargs['pk']
         )
 
-class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
-    #permission_classes = []
+class CommentDetail(generics.RetrieveDestroyAPIView): #generics.RetrieveUpdateDestroyAPIView
+    serializer_class = CommentSerializer
+    permission_classes = [IsBoardOwner | IsBoardMember]
 
-    def get_serializer_class(self):
-        if self.request.method in ['PUT', 'PATCH']:
-            return CommentCreateUpdateSerializer
-        return CommentSerializer
+    # def get_serializer_class(self):
+    #     if self.request.method in ['PUT', 'PATCH']:
+    #         return CommentCreateUpdateSerializer
+    #     return CommentSerializer
+    # -> Falls ich später möchte, dass der Author eines Comments diesen auch ändern kann, kann ich das hier noch nutzen!
     
     def get_queryset(self):
         task_id = self.kwargs['task_pk']
         return Comment.objects.filter(task_id=task_id)
+    
+    # zusätzliche Objekt-Permission für DELETE:
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        if self.request.method == 'DELETE':
+            permissions.append(IsAuthor())
+        return permissions
