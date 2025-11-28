@@ -9,8 +9,9 @@ This module defines the top-level URL routing:
 Each included module provides its own URL patterns.
 """
 
-from django.contrib import admin
 from django.urls import path, include
+from django.contrib import admin
+
 
 urlpatterns = [
     # Django admin interface

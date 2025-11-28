@@ -6,8 +6,8 @@ It includes both read-oriented and write-oriented serializers, as well as
 extended variants exposing aggregated board/task statistics.
 """
 
-from rest_framework import serializers
 from django.contrib.auth.models import User
+from rest_framework import serializers
 from kanban_app.models import Board, Task, Comment
 
 

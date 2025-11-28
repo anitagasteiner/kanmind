@@ -16,12 +16,12 @@ Views included:
 - CommentDetail: Retrieve or delete a specific comment.
 """
 
+from django.db.models import Q
+from django.contrib.auth.models import User
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Q
-from django.contrib.auth.models import User
 from kanban_app.models import Board, Task, Comment
 from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer
 from .permissions import IsBoardOwner, IsBoardMember, IsAuthor
@@ -207,5 +207,4 @@ class CommentDetail(generics.RetrieveDestroyAPIView): #generics.RetrieveUpdateDe
         if self.request.method == 'DELETE':
             permissions.append(IsAuthor())
         return permissions
-    
     
