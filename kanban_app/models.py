@@ -1,9 +1,26 @@
+"""
+Models for the Kanmind backend Kanban application.
+
+This module defines:
+- Board: A Kanban board with an owner and member users.
+- Task: Work items tracked on a board, including status, priority, and assignment.
+- Comment: User-authored comments attached to tasks.
+"""
+
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
 
 class Board(models.Model):
+    """
+    Represents a Kanban board.
+
+    Fields:
+        title (str): Board title.
+        owner (User): The user who created and owns the board.
+        members (QuerySet[User]): Users who have access to the board.
+    """
     title = models.CharField(max_length=50)
     owner = models.ForeignKey(
         User,
@@ -16,10 +33,30 @@ class Board(models.Model):
     )
     
     def __str__(self):
+        """Return the board title as its string representation."""
         return self.title
     
 
-class Task(models.Model):    
+class Task(models.Model):
+    """
+    Represents a task within a Kanban board.
+
+    Fields:
+        title (str): Task title.
+        description (str): Detailed task description.
+        assignee (User|None): User responsible for executing the task.
+        reviewer (User|None): User responsible for reviewing the task.
+        status (str): Workflow status from predefined choices.
+        priority (str): Task urgency level.
+        due_date (date): Deadline for the task.
+        board (Board): Board to which the task belongs.
+
+    Status values:
+        to_do, in_progress, review, done
+
+    Priority values:
+        low, medium, high
+    """
     TO_DO = "to_do"
     IN_PROGRESS = "in_progress"
     REVIEW = "review"
@@ -54,8 +91,16 @@ class Task(models.Model):
         null=True,
         related_name='reviewed_tasks'
     )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=TO_DO)
-    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default=MEDIUM)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=TO_DO
+    )
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default=MEDIUM
+    )
     due_date = models.DateField(default=timezone.now)
     board = models.ForeignKey(
         Board,
@@ -64,10 +109,20 @@ class Task(models.Model):
     )
 
     def __str__(self):
+        """Return the task title as its string representation."""
         return self.title
 
 
 class Comment(models.Model):
+    """
+    Represents a comment attached to a task.
+
+    Fields:
+        created_at (datetime): Timestamp of comment creation.
+        author (User): User who authored the comment.
+        content (str): Text content of the comment.
+        task (Task): Associated task.
+    """
     created_at = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(
         User,
@@ -82,5 +137,6 @@ class Comment(models.Model):
     )
 
     def __str__(self):
+        """Return the comment content as its string representation."""
         return self.content
     
