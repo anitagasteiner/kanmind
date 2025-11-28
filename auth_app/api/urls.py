@@ -1,6 +1,16 @@
+"""
+URL configuration for the authentication API of Kanmind.
+
+This module defines the endpoints for user registration, login, and logout.
+
+Endpoints:
+- /registration/ : Register a new user.
+- /login/        : Authenticate a user and obtain a session or token.
+- /logout/       : Logout the current user.
+"""
+
 from django.urls import path
 from .views import RegistrationView, LoginView, LogoutView
-#from rest_framework.authtoken.views import obtain_auth_token
 
 
 urlpatterns = [
