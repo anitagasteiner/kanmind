@@ -50,9 +50,9 @@ cd kanmind-backend
 
 ### Create Virtual Environment
 
-python -m venv .venv
-source .venv/bin/activate   # Linux / macOS
-.venv\Scripts\activate      # Windows
+    python -m venv .venv
+    source .venv/bin/activate   # Linux / macOS
+    .venv\Scripts\activate      # Windows
 
 
 ### Install Dependencies
