@@ -1,25 +1,25 @@
 """
-URL configuration for core project.
+Root URL configuration for the Kanmind project.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+This module defines the top-level URL routing:
+- Admin interface
+- Authentication API endpoints
+- Kanban application API endpoints
+
+Each included module provides its own URL patterns.
 """
+
 from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    # Django admin interface
     path('admin/', admin.site.urls),
+
+    # Authentication endpoints
     path('auth/', include('auth_app.api.urls')),
+
+    # Kanban API endpoints
     path('api/', include('kanban_app.api.urls'))
 ]
 
