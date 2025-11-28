@@ -56,7 +56,7 @@ Follow these steps to set up a local development environment:
 
 ### Install Dependencies
 
-pip install -r requirements.txt
+    pip install -r requirements.txt
 
 ## API Documentation
 
