@@ -1,12 +1,14 @@
-from django.urls import path #, include
-#from rest_framework.routers import DefaultRouter
+"""
+URL routes for the Kanmind API.
+
+This module maps HTTP endpoints to their corresponding view classes.  
+It organizes routes for boards, tasks, user-specific task filters, and task comments.
+"""
+
+from django.urls import path
 from .views import BoardsView, BoardDetail, EmailCheckView, TasksView, TaskDetail, TasksAssignedToMeView, TasksReviewingView, CommentsView, CommentDetail
 
-# router = DefaultRouter()
-# router.register(r'kanban', TaskViewSet, basename='tasks')
-
 urlpatterns = [
-    #path('', include(router.urls)),
     path('boards/', BoardsView.as_view(), name='boards-list'),
     path('boards/<int:pk>', BoardDetail.as_view(), name='board-detail'),
     path('email-check/', EmailCheckView.as_view(), name='email-check'),
