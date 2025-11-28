@@ -45,8 +45,8 @@ Follow these steps to set up a local development environment:
 
 ### Clone the Repository
 
-git clone https://github.com/your-username/kanmind-backend.git
-cd kanmind-backend
+    git clone https://github.com/your-username/kanmind-backend.git
+    cd kanmind-backend
 
 ### Create Virtual Environment
 
