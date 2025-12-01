@@ -18,7 +18,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Authentication endpoints
-    path('auth/', include('auth_app.api.urls')),
+    path('api/', include('auth_app.api.urls')),
 
     # Kanban API endpoints
     path('api/', include('kanban_app.api.urls'))
