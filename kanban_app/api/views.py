@@ -94,7 +94,7 @@ class EmailCheckView(APIView):
         
         serializer = UserMiniSerializer(user)
         return Response(
-            {"exists": True, "user": serializer.data},
+            serializer.data,
             status=status.HTTP_200_OK
         )
 
