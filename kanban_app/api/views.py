@@ -22,6 +22,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from kanban_app.models import Board, Task, Comment
 from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer
 from .permissions import IsBoardOwner, IsBoardMember, IsAuthor
@@ -79,10 +80,11 @@ class EmailCheckView(APIView):
         email = request.query_params.get('email')
 
         if not email:
-            return Response(
-                {"error": "Email parameter is required."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            raise ValidationError({'email': 'Email parameter is required.'})
+            # return Response(
+            #     {"error": "Email parameter is required."},
+            #     status=status.HTTP_400_BAD_REQUEST
+            # )
 
         try:
             user = User.objects.get(email=email)
