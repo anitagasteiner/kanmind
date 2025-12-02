@@ -28,13 +28,11 @@ class IsBoardOwnerOrMember(BasePermission):
         elif hasattr(obj, 'members'):
             return obj.members.filter(id=request.user.id).exists()
         elif hasattr(obj, 'board'):
-            return obj.board.owner == request.user
-        elif hasattr(obj, 'board'):
-            return obj.board.members.filter(id=request.user.id).exists()
+            if obj.board.owner == request.user or obj.board.members.filter(id=request.user.id).exists():
+                return True
         elif hasattr(obj, 'task'):
-            return obj.task.board.owner == request.user
-        elif hasattr(obj, 'task'):
-            return obj.task.board.members.filter(id=request.user.id).exists()
+            if obj.task.board.owner == request.user or obj.task.board.members.filter(id=request.user.id).exists():
+                return True
         return False
     
     

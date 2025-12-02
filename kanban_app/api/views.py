@@ -71,7 +71,7 @@ class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
 
         if self.request.method == 'DELETE':
             return [IsAuthenticated(), IsBoardOwner()]
-        return [IsAuthenticated(), IsBoardOwnerOrMember]
+        return [IsAuthenticated(), IsBoardOwnerOrMember()]
 
 
 class EmailCheckView(APIView):
