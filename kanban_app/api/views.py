@@ -96,10 +96,6 @@ class EmailCheckView(APIView):
 
         if not email:
             raise ValidationError({'email': 'Email parameter is required.'})
-            # return Response(
-            #     {"error": "Email parameter is required."},
-            #     status=status.HTTP_400_BAD_REQUEST
-            # )
 
         try:
             user = User.objects.get(email=email)
