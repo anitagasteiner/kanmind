@@ -25,7 +25,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from kanban_app.models import Board, Task, Comment
 from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer
-from .permissions import IsBoardOwner, IsBoardMember, IsAuthor
+from .permissions import IsBoardOwnerOrMember, IsBoardOwner, IsAuthor
 
 
 class BoardsView(generics.ListCreateAPIView):
@@ -35,7 +35,7 @@ class BoardsView(generics.ListCreateAPIView):
     """
 
     serializer_class = BoardSerializer
-    permission_classes = [IsAuthenticated, IsBoardOwner | IsBoardMember]
+    permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
 
     def get_queryset(self):
         """Return boards where the user is owner or member."""
@@ -71,7 +71,7 @@ class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
 
         if self.request.method == 'DELETE':
             return [IsAuthenticated(), IsBoardOwner()]
-        return [IsAuthenticated(), IsBoardOwner() | IsBoardMember()]
+        return [IsAuthenticated(), IsBoardOwnerOrMember]
 
 
 class EmailCheckView(APIView):
@@ -118,7 +118,7 @@ class TasksView(generics.ListCreateAPIView):
     """
        
     queryset = Task.objects.all()
-    permission_classes = [IsAuthenticated, IsBoardOwner | IsBoardMember]
+    permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -132,7 +132,7 @@ class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     """
         
     queryset = Task.objects.all()
-    permission_classes = [IsAuthenticated, IsBoardOwner | IsBoardMember]
+    permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
@@ -146,7 +146,7 @@ class TasksAssignedToMeView(generics.ListAPIView):
     """
         
     serializer_class = TaskAssignedOrReviewingSerializer
-    permission_classes = [IsAuthenticated, IsBoardOwner | IsBoardMember]
+    permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
 
     def get_queryset(self):
         """Return tasks where the current user is the assignee."""
@@ -160,7 +160,7 @@ class TasksReviewingView(generics.ListAPIView):
     """
         
     serializer_class = TaskAssignedOrReviewingSerializer
-    permission_classes = [IsAuthenticated, IsBoardOwner | IsBoardMember]
+    permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
 
     def get_queryset(self):
         """Return tasks where the current user is the reviewer."""
@@ -173,7 +173,7 @@ class CommentsView(generics.ListCreateAPIView):
     List comments for a specific task or create a new comment.
     """
         
-    permission_classes = [IsAuthenticated, IsBoardOwner | IsBoardMember]
+    permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
     
     def get_queryset(self):
         """Return comments related to the task identified by 'pk' URL parameter."""
@@ -199,7 +199,7 @@ class CommentDetail(generics.RetrieveDestroyAPIView): #generics.RetrieveUpdateDe
     Additional object permission ensures only the author can delete their comment.
     """
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, IsBoardOwner | IsBoardMember]
+    permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
 
     # def get_serializer_class(self):
     #     if self.request.method in ['PUT', 'PATCH']:
