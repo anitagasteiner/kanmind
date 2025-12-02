@@ -48,15 +48,30 @@ class BoardsView(generics.ListCreateAPIView):
 class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update, or delete a specific board by ID.
+
+    Permissions:
+    - GET: Owner or Member
+    - PATCH/PUT: Owner or Member
+    - DELETE: Only Owner
     """
 
     queryset = Board.objects.all()
-    permission_classes = [IsAuthenticated, IsBoardOwner | IsBoardMember]
 
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
             return BoardUpdateSerializer
         return BoardDetailSerializer
+    
+    def get_permissions(self):
+        """
+        Dynamically assign permissions based on the request method:
+        - DELETE: Only the board owner can delete.
+        - GET, PATCH, PUT: Owner or member can view or update.
+        """
+
+        if self.request.method == 'DELETE':
+            return [IsAuthenticated(), IsBoardOwner()]
+        return [IsAuthenticated(), IsBoardOwner() | IsBoardMember()]
 
 
 class EmailCheckView(APIView):
