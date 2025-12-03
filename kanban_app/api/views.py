@@ -196,6 +196,18 @@ class CommentsView(generics.ListCreateAPIView):
     def get_queryset(self):
         """Return comments related to the task identified by 'pk' URL parameter."""
         task_id = self.kwargs['pk']
+
+        try:
+            task = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
+            raise NotFound(f"Task mit ID {task_id} existiert nicht.")
+
+        user = self.request.user        
+        board = task.board
+
+        if board.owner != user and not board.members.filter(id=user.id).exists():
+            raise PermissionDenied("Du bist kein Mitglied dieses Boards.")
+
         return Comment.objects.filter(task_id=task_id)
 
     def get_serializer_class(self):
@@ -205,9 +217,23 @@ class CommentsView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         """Set author to the current user and associate with the task."""
+
+        task_id = self.kwargs['pk']
+
+        try:
+            task = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
+            raise NotFound(f"Task mit ID {task_id} existiert nicht.")
+        
+        user = self.request.user
+        board = task.board
+
+        if board.owner != user and not board.members.filter(id=user.id).exists():
+            raise PermissionDenied("Du bist kein Mitglied dieses Boards.")
+        
         serializer.save(
-            author=self.request.user,
-            task_id=self.kwargs['pk']
+            author=user,
+            task_id=task_id
         )
 
 
