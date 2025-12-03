@@ -8,6 +8,7 @@ extended variants exposing aggregated board/task statistics.
 
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework.exceptions import NotFound
 from kanban_app.models import Board, Task, Comment
 
 
@@ -244,6 +245,10 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         assignee = validated_data.pop('assignee_id')
         reviewer = validated_data.pop('reviewer_id', None)
+        board = validated_data.pop('board')
+
+        if not Board.objects.filter(pk=board.id).exists():
+            raise NotFound('Board not found.')
             
         task = Task.objects.create(
             assignee=assignee,
@@ -336,3 +341,8 @@ class CommentCreateUpdateSerializer(serializers.ModelSerializer):
     def get_author(self, obj):
         return obj.author.get_full_name()
 
+
+class EmailCheckSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    

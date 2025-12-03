@@ -24,7 +24,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from kanban_app.models import Board, Task, Comment
-from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer
+from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer, EmailCheckSerializer
 from .permissions import IsBoardOwnerOrMember, IsBoardOwner, IsAuthor
 
 
@@ -91,8 +91,11 @@ class EmailCheckView(APIView):
         Returns:
             Response indicating whether the user exists and, if so, basic user info.
         """
-                
-        email = request.query_params.get('email')
+
+        serializer = EmailCheckSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data['email']
 
         if not email:
             raise ValidationError({'email': 'Email parameter is required.'})
