@@ -10,6 +10,7 @@ This module defines:
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from datetime import date
 
 
 class Board(models.Model):
@@ -101,7 +102,7 @@ class Task(models.Model):
         choices=PRIORITY_CHOICES,
         default=MEDIUM
     )
-    due_date = models.DateField(default=timezone.now)
+    due_date = models.DateField(default=date.today)
     board = models.ForeignKey(
         Board,
         on_delete=models.CASCADE,

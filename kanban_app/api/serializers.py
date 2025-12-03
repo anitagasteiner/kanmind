@@ -221,6 +221,7 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     comments_count = serializers.SerializerMethodField()
     status = serializers.ChoiceField(choices=Task.STATUS_CHOICES)
     priority = serializers.ChoiceField(choices=Task.PRIORITY_CHOICES)
+    due_date = serializers.DateField(required=True)
 
     class Meta:
         model = Task
@@ -243,7 +244,7 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
         return obj.comments.count()
     
     def create(self, validated_data):
-        assignee = validated_data.pop('assignee_id')
+        assignee = validated_data.pop('assignee_id', None)
         reviewer = validated_data.pop('reviewer_id', None)
         board = validated_data.pop('board')
 
@@ -251,6 +252,7 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
             raise NotFound('Board not found.')
             
         task = Task.objects.create(
+            board=board,
             assignee=assignee,
             reviewer=reviewer,
             **validated_data
@@ -345,4 +347,3 @@ class CommentCreateUpdateSerializer(serializers.ModelSerializer):
 class EmailCheckSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
-    

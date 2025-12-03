@@ -22,7 +22,7 @@ from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, PermissionDenied
 from kanban_app.models import Board, Task, Comment
 from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer, EmailCheckSerializer
 from .permissions import IsBoardOwnerOrMember, IsBoardOwner, IsAuthor
@@ -127,6 +127,15 @@ class TasksView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return TaskCreateUpdateSerializer
         return TaskSerializer
+
+    def perform_create(self, serializer):
+        board = serializer.validated_data['board']
+        user = self.request.user
+
+        if board.owner != user and not board.members.filter(id=user.id).exists():
+            raise PermissionDenied("You are not a member of this board.")   
+
+        serializer.save()         
 
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):

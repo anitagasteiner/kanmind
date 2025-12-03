@@ -27,6 +27,8 @@ This ensures consistent, predictable error formatting across the entire API.
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import ValidationError as DRFValidationError
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import IntegrityError
 
@@ -48,6 +50,18 @@ def global_exception_handler(exc, context):
 
     if response is not None:
         return response
+    
+    if isinstance(exc, (DjangoValidationError, DRFValidationError)):
+        return Response(
+            {'error': exc.message},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    if isinstance(exc, (TypeError, ValueError)):
+        return Response(
+            {'error': str(exc)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     if isinstance(exc, ObjectDoesNotExist):
         return Response(
