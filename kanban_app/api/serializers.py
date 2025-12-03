@@ -222,6 +222,7 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     status = serializers.ChoiceField(choices=Task.STATUS_CHOICES)
     priority = serializers.ChoiceField(choices=Task.PRIORITY_CHOICES)
     due_date = serializers.DateField(required=True)
+    board = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Task
@@ -246,10 +247,12 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         assignee = validated_data.pop('assignee_id', None)
         reviewer = validated_data.pop('reviewer_id', None)
-        board = validated_data.pop('board')
+        board_id = validated_data.pop('board')
 
-        if not Board.objects.filter(pk=board.id).exists():
-            raise NotFound('Board not found.')
+        try:
+            board = Board.objects.get(pk=board_id)
+        except Board.DoesNotExist:
+            raise NotFound(f'Board with ID {board_id} not found.')
             
         task = Task.objects.create(
             board=board,
