@@ -128,7 +128,7 @@ class TasksView(generics.ListCreateAPIView):
             return TaskCreateUpdateSerializer
         return TaskSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer): #TODO Doku dieser Funktion, weil ich sie überschreibe! -> Warum überschreibe ich sie? Zweckmäßigkeit!
         board_id = serializer.validated_data['board']
 
         try:
@@ -194,7 +194,7 @@ class CommentsView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
     
     def get_queryset(self):
-        """Return comments related to the task identified by 'pk' URL parameter."""
+        """Return comments related to the task identified by 'pk' URL parameter.""" # TODO - Ich filtere auch noch, das fehlt!!!
         task_id = self.kwargs['pk']
 
         try:
