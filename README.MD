@@ -49,11 +49,12 @@ Follow these steps to set up a local development environment:
 
 ### Create Virtual Environment
 
+<!-- cd directory fehlt noch! -->
     python -m venv .venv
     source .venv/bin/activate   # Linux / macOS
     .venv\Scripts\activate      # Windows
 
-
+<!-- Migration fehlt noch, runserver auch! -->
 ### Install Dependencies
 
     pip install -r requirements.txt
@@ -62,7 +63,8 @@ Follow these steps to set up a local development environment:
 
 The backend exposes RESTful endpoints under /auth/ and /api/, including:
 
-    /auth/ - registration, login and token management
+    /api/registration - registration and token management
+    /api/login - login
     /api/boards/ - boards CRUD operations
     /api/tasks/ - tasks CRUD operations
 
