@@ -247,15 +247,8 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         assignee = validated_data.pop('assignee_id', None)
         reviewer = validated_data.pop('reviewer_id', None)
-        board_id = validated_data.pop('board')
-
-        try:
-            board = Board.objects.get(pk=board_id)
-        except Board.DoesNotExist:
-            raise NotFound(f'Board with ID {board_id} not found.')
             
         task = Task.objects.create(
-            board=board,
             assignee=assignee,
             reviewer=reviewer,
             **validated_data

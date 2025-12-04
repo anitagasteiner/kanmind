@@ -135,7 +135,7 @@ class TasksView(generics.ListCreateAPIView):
             board = Board.objects.get(pk=board_id)
         except Board.DoesNotExist:
             raise NotFound(f'Board with ID {board_id} not found.')
-        
+            
         user = self.request.user
 
         if board.owner != user and not board.members.filter(id=user.id).exists():
