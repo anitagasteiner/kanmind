@@ -3,6 +3,7 @@ Custom permission classes for the Kanmind API.
 
 These permissions provide object-level access control for boards, tasks, and comments:
 - IsBoardOwnerOrMember: Grants access only to users who are the owner or a member of the associated board.
+- IsBoardOwner: Grants access only to users who are the owner of the associated board.
 - IsAuthor: Grants access only to the author of the object.
 """
 
