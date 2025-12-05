@@ -8,7 +8,6 @@ extended variants exposing aggregated board/task statistics.
 
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from rest_framework.exceptions import NotFound
 from kanban_app.models import Board, Task, Comment
 
 
@@ -65,6 +64,24 @@ class TaskSerializer(serializers.ModelSerializer):
     def get_comments_count(self, obj):
         return obj.comments.count()
 
+
+class TaskDetailSerializer(TaskSerializer):
+    class Meta:
+        model = Task
+        fields = [
+            'id',
+            'board',
+            'title',
+            'description',
+            'status',
+            'priority',
+            'assignee',
+            'reviewer',
+            'due_date',
+            'comments_count'
+        ]
+        read_only_fields = ['id']
+    
 
 class BoardSerializer(serializers.ModelSerializer):
     """
@@ -218,11 +235,11 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     )
     assignee = UserMiniSerializer(read_only=True)
     reviewer = UserMiniSerializer(read_only=True)
+    board = serializers.IntegerField(write_only=True)
     comments_count = serializers.SerializerMethodField()
     status = serializers.ChoiceField(choices=Task.STATUS_CHOICES)
     priority = serializers.ChoiceField(choices=Task.PRIORITY_CHOICES)
     due_date = serializers.DateField(required=True)
-    board = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Task

@@ -24,7 +24,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError, PermissionDenied, NotFound
 from kanban_app.models import Board, Task, Comment
-from .serializers import TaskSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer, EmailCheckSerializer
+from .serializers import TaskSerializer, TaskDetailSerializer, BoardSerializer, BoardDetailSerializer, BoardUpdateSerializer, UserMiniSerializer, TaskAssignedOrReviewingSerializer, TaskCreateUpdateSerializer, CommentSerializer, CommentCreateUpdateSerializer, EmailCheckSerializer
 from .permissions import IsBoardOwnerOrMember, IsBoardOwner, IsAuthor
 
 
@@ -127,21 +127,27 @@ class TasksView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return TaskCreateUpdateSerializer
         return TaskSerializer
+    
+    def create(self, request, *args, **kwargs):
+        serializer = self. get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-    def perform_create(self, serializer): #TODO Doku dieser Funktion, weil ich sie überschreibe! -> Warum überschreibe ich sie? Zweckmäßigkeit!
-        board_id = serializer.validated_data['board']
+        board_id = serializer.validated_data.get('board')
 
         try:
             board = Board.objects.get(pk=board_id)
         except Board.DoesNotExist:
             raise NotFound(f'Board with ID {board_id} not found.')
-            
-        user = self.request.user
+        
+        user = request.user
 
         if board.owner != user and not board.members.filter(id=user.id).exists():
             raise PermissionDenied("You are not a member of this board.")   
 
-        serializer.save(board=board)  
+        task = serializer.save(board=board)
+
+        output_serializer = TaskDetailSerializer(task, context={'request': request})
+        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
             
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -155,8 +161,8 @@ class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     def get_serializer_class(self):
         if self.request.method in ['PUT', 'PATCH']:
             return TaskCreateUpdateSerializer
-        return TaskSerializer
-    
+        return TaskDetailSerializer
+        
 
 class TasksAssignedToMeView(generics.ListAPIView):
     """
@@ -237,19 +243,13 @@ class CommentsView(generics.ListCreateAPIView):
         )
 
 
-class CommentDetail(generics.RetrieveDestroyAPIView): #generics.RetrieveUpdateDestroyAPIView
+class CommentDetail(generics.RetrieveDestroyAPIView):
     """
     Retrieve or delete a specific comment.
     Additional object permission ensures only the author can delete their comment.
     """
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
-
-    # def get_serializer_class(self):
-    #     if self.request.method in ['PUT', 'PATCH']:
-    #         return CommentCreateUpdateSerializer
-    #     return CommentSerializer
-    # -> Falls ich später möchte, dass der Author eines Comments diesen auch ändern kann, kann ich das hier noch nutzen!
     
     def get_queryset(self):
         """Return comments for the task identified by 'task_pk' URL parameter."""
