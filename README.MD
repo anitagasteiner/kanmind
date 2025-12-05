@@ -49,15 +49,22 @@ Follow these steps to set up a local development environment:
 
 ### Create Virtual Environment
 
-<!-- cd directory fehlt noch! -->
+    cd kanmind
     python -m venv .venv
     source .venv/bin/activate   # Linux / macOS
     .venv\Scripts\activate      # Windows
 
-<!-- Migration fehlt noch, runserver auch! -->
 ### Install Dependencies
 
     pip install -r requirements.txt
+
+### Migration
+    
+    python manage.py migrate
+
+### Run Server
+
+    python manage.py runserver
 
 ## API Documentation
 
