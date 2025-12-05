@@ -1,21 +1,20 @@
 """
 Custom global exception handler for the Kanmind API.
 
-This module defines a unified exception-handling mechanism for all API views.
-It extends Django REST Framework's default exception handler to ensure that
-uncaught or framework-external errors are returned in a consistent and clean
-JSON format.
+This module provides a unified exception-handling strategy for all API endpoints.
+It extends Django REST Framework's built-in exception handler to ensure that
+both framework-level and unexpected errors are returned in a consistent JSON
+format.
 
 Behavior:
-- Known DRF exceptions are delegated to the standard DRF exception handler.
-- Common Django exceptions such as ObjectDoesNotExist, PermissionDenied, and
-  IntegrityError are converted into structured API responses.
-- All other unhandled exceptions fall back to a generic 500 response containing an error message and minimal debug details.
-
-Structure:
-- global_exception_handler: Main entry point for DRF's EXCEPTION_HANDLER setting.
+- DRF-native exceptions are first delegated to DRF's default exception handler.
+- Common Django exceptions (ObjectDoesNotExist, PermissionDenied, ValidationError, IntegrityError) are mapped to structured API responses with appropriate status codes.
+- TypeError and ValueError are treated as client errors (400 Bad Request).
+- Any remaining unhandled exceptions result in a generic 500 response that includes a minimal error description and the exception detail string.
 
 Handled cases:
+- Django/DRF ValidationError → 400 Bad Request
+- TypeError, ValueError → 400 Bad Request
 - ObjectDoesNotExist → 404 Not Found
 - PermissionDenied → 403 Forbidden
 - IntegrityError → 400 Bad Request
