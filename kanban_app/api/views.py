@@ -118,6 +118,10 @@ class EmailCheckView(APIView):
 class TasksView(generics.ListCreateAPIView):
     """
     List all tasks and allow creation of new tasks.
+
+    Permissions:
+    - GET: Authenticated users. Access to each task is enforced by IsBoardOwnerOrMember so users only see tasks for boards they own or are members of.
+    - POST: Authenticated users who are the owner or a member of the target board. The create() method validates the board exists and checks membership; non-members receive PermissionDenied.
     """
        
     queryset = Task.objects.all()
@@ -129,6 +133,15 @@ class TasksView(generics.ListCreateAPIView):
         return TaskSerializer
     
     def create(self, request, *args, **kwargs):
+        """
+        Create a new Task:
+        - Validate request data with TaskCreateUpdateSerializer.
+        - Extract board ID from validated_data and ensure the board exists.
+        - Ensure the requesting user is the board owner or a board member.
+        - Save the new task associated with the resolved Board instance.
+        - Return the created task serialized with TaskDetailSerializer.
+        """
+
         serializer = self. get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -200,7 +213,13 @@ class CommentsView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsBoardOwnerOrMember]
     
     def get_queryset(self):
-        """Return comments related to the task identified by 'pk' URL parameter.""" # TODO - Ich filtere auch noch, das fehlt!!!
+        """Return comments related to the task identified by 'pk' URL parameter:
+        - Resolve task by pk (kwargs['pk']).
+        - Ensure requesting user is owner or member of the task's board.
+        - Return Comment queryset filtered by the resolved task_id.
+        
+        """
+        
         task_id = self.kwargs['pk']
 
         try:
