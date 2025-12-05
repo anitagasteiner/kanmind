@@ -216,10 +216,9 @@ class CommentsView(generics.ListCreateAPIView):
         """Return comments related to the task identified by 'pk' URL parameter:
         - Resolve task by pk (kwargs['pk']).
         - Ensure requesting user is owner or member of the task's board.
-        - Return Comment queryset filtered by the resolved task_id.
-        
+        - Return Comment queryset filtered by the resolved task_id.        
         """
-        
+
         task_id = self.kwargs['pk']
 
         try:
