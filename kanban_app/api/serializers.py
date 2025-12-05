@@ -66,6 +66,10 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class TaskDetailSerializer(TaskSerializer):
+    """
+    Read-oriented serializer for task detail information.
+    """
+        
     class Meta:
         model = Task
         fields = [
@@ -219,7 +223,7 @@ class TaskCreateUpdateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating and updating tasks.
 
-    Supports assigning users via ID fields while providing nested user info on read.
+    Supports assigning users and adding reviewers via ID fields while providing nested user information on read.
     """
         
     assignee_id = serializers.PrimaryKeyRelatedField(
@@ -358,5 +362,11 @@ class CommentCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class EmailCheckSerializer(serializers.Serializer):
+    """
+    Serializer for validating a single email address in public endpoints.
+
+    Validates the format of an email address supplied to public-facing endpoints (e.g. "email exists" checks during registration).
+    """
+    
     email = serializers.EmailField(required=True)
 
