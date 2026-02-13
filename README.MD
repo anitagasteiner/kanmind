@@ -45,35 +45,53 @@ Follow these steps to set up a local development environment:
 
 ### Clone the Repository
 
-    git clone https://github.com/anitagasteiner/kanmind.git
+```bash
+git clone https://github.com/anitagasteiner/kanmind.git
+```
 
 ### Create Virtual Environment
 
-    cd kanmind
-    python -m venv .venv
-    source .venv/bin/activate   # Linux / macOS
-    .venv\Scripts\activate      # Windows
+```bash
+cd kanmind
+python -m venv .venv
+source .venv/bin/activate   # Linux / macOS
+.venv\Scripts\activate      # Windows
+```
 
 ### Install Dependencies
 
-    pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
+```
 
 ### Migration
     
-    python manage.py migrate
+```bash
+python manage.py migrate
+```
 
 ### Run Server
 
-    python manage.py runserver
+```bash
+python manage.py runserver
+```
+
+### Create Superuser (optional)
+
+```bash
+python manage.py createsuperuser
+```
 
 ## API Documentation
 
 The backend exposes RESTful endpoints under /auth/ and /api/, including:
 
-    /api/registration - registration and token management
-    /api/login - login
-    /api/boards/ - boards CRUD operations
-    /api/tasks/ - tasks CRUD operations
+| API Endpoint | Description |
+| --------------- | -------------- |
+| '/api/registration' | registration and token management |
+| '/api/login' | login |
+| '/api/boards/' | boards CRUD operations |
+| '/api/tasks/' | tasks CRUD operations |
 
 ## License
 
